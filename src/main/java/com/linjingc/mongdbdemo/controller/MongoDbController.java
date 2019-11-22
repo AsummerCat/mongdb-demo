@@ -1,5 +1,6 @@
 package com.linjingc.mongdbdemo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linjingc.mongdbdemo.dao.MongoDao;
 import com.linjingc.mongdbdemo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class MongoDbController {
 	@RequestMapping("sortData")
 	public String sortData() {
 		List<User> users = mongoDao.sortData();
-		return "排序查询成功---->"+users.toString();
+		return "排序查询成功---->" + users.toString();
 	}
 
 
@@ -80,19 +81,43 @@ public class MongoDbController {
 	@RequestMapping("limitData")
 	public String limitData() {
 		List<User> users = mongoDao.limitData();
-		return "获取指定条数查询成功---->"+users.toString();
+		return "获取指定条数查询成功---->" + users.toString();
 	}
 
 
 	/**
 	 * 分页查询
+	 *
 	 * @return
 	 */
 	@RequestMapping("pageData")
 	public String pageData() {
 		List<User> users = mongoDao.pageData();
-		return "分页查询成功---->"+users.toString();
+		return "分页查询成功---->" + users.toString();
 	}
+
+	/**
+	 * 分组查询
+	 *
+	 * @return
+	 */
+	@RequestMapping("groupByData")
+	public String groupByData() {
+		List<JSONObject> users = mongoDao.groupByData();
+		return "分组查询成功---->" + users.toString();
+	}
+
+	/**
+	 * 去重查询
+	 *
+	 * @return
+	 */
+	@RequestMapping("getDistinctList")
+	public String getDistinctList() {
+		List<Integer> users = mongoDao.getDistinctList();
+		return "分组查询成功---->" + users.toString();
+	}
+
 
 
 }

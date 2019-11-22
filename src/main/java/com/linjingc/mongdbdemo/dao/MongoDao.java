@@ -1,6 +1,7 @@
 package com.linjingc.mongdbdemo.dao;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.linjingc.mongdbdemo.entity.User;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -145,5 +148,49 @@ public class MongoDao {
 
 	return resolveRules;
 }
+
+
+	/**
+	 * 分组查询
+	 */
+    public List<JSONObject> groupByData(){
+	    Aggregation agg = Aggregation.newAggregation(
+
+			    // 第一步：挑选所需的字段，类似select *，*所代表的字段内容
+			    Aggregation.project("name", "age", "address"),
+			    // 第二步：sql where 语句筛选符合条件的记录
+//            Aggregation.match(Criteria.where("userId").is(map.get("userId"))),
+			    // 第三步：分组条件，设置分组字段
+			    Aggregation.group("age")
+					    .avg("age").as("allAge")
+					    .max("name").as("DataName"),
+
+			    // 第四部：排序（根据某字段排序 倒序）
+			    Aggregation.sort(Sort.Direction.DESC,"age"),
+			    // 第五步：数量(分页)
+			    Aggregation.limit(15),
+			    // 第六步：重新挑选字段  显示的字段
+			    Aggregation.project("allAge","DataName")
+
+	    );
+
+	    AggregationResults<JSONObject> results = mongoTemplate.aggregate(agg, User.class, JSONObject.class);
+
+	    List<JSONObject> mappedResults = results.getMappedResults();
+
+    	return mappedResults;
+    }
+
+
+	/**
+	 * 去重查询
+	 * @return
+	 */
+	public List<Integer>  getDistinctList(){
+
+		Query query = new Query();
+		List<Integer> list = mongoTemplate.findDistinct(query,"age",User.class, Integer.class);
+    	return list;
+    }
 
 }
