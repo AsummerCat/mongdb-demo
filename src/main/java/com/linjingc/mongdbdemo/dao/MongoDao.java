@@ -5,6 +5,9 @@ import com.linjingc.mongdbdemo.entity.User;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,9 +15,10 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static org.springframework.data.domain.Sort.Direction;
 
 @Component
 public class MongoDao {
@@ -54,7 +58,7 @@ public class MongoDao {
 	/**
 	 * 更新对象
 	 */
-	@Transactional(rollbackFor = { Exception.class })
+	@Transactional(rollbackFor = {Exception.class})
 	public void updateUserAddress(User user) {
 		Query query = new Query(Criteria.where("name").is(user.getName()));
 
@@ -81,17 +85,65 @@ public class MongoDao {
 
 	/**
 	 * 模糊查询
+	 *
 	 * @param search
 	 * @return
 	 */
-	public List<User> findByLikes(String search){
+	public List<User> findByLikes(String search) {
 		Query query = new Query();
-		Pattern pattern = Pattern.compile("^.*" + search + ".*$" , Pattern.CASE_INSENSITIVE);
+
+//完全匹配
+		//	Pattern pattern1 = Pattern.compile("^张$", Pattern.CASE_INSENSITIVE);
+//右匹配
+		//	Pattern pattern2 = Pattern.compile("^.*张$", Pattern.CASE_INSENSITIVE);
+//左匹配
+		//Pattern pattern3 = Pattern.compile("^张.*$", Pattern.CASE_INSENSITIVE);
+//模糊匹配
+		//	Pattern pattern4 = Pattern.compile("^.*张.*$", Pattern.CASE_INSENSITIVE);
+
+		Pattern pattern = Pattern.compile("^.*" + search + ".*$", Pattern.CASE_INSENSITIVE);
 		Criteria criteria = Criteria.where("name").regex(pattern);
 		query.addCriteria(criteria);
 		List<User> lists = mongoTemplate.findAllAndRemove(query, User.class);
 		return lists;
 	}
 
+
+	/**
+	 * 排序查询
+	 */
+	public List<User> sortData() {
+		Sort sort = Sort.by(Direction.ASC, "age");
+//		Criteria criteria = Criteria.where("address").is(0);//查询条件
+//		Query query = new Query(criteria);
+		List<User> users = mongoTemplate.find(new Query().with(sort), User.class);
+		return users;
+	}
+
+	/**
+	 * 获取指定条数
+	 */
+	public List<User> limitData() {
+		Sort sort = Sort.by(Direction.ASC, "age");
+//		Criteria criteria = Criteria.where("address").is(0);//查询条件
+//		Query query = new Query(criteria);
+		List<User> users = mongoTemplate.find(new Query().limit(3), User.class);
+		return users;
+	}
+
+	/**
+	 * 分页查询
+	 * @return
+	 */
+	public List<User> pageData(){
+		//页数从0开始
+		int page=0;
+		int size=2;
+	Query query = new Query();
+	Pageable pageable = PageRequest.of(page, size);
+	List<User> resolveRules = mongoTemplate.find(query.with(pageable), User.class);
+
+	return resolveRules;
+}
 
 }
