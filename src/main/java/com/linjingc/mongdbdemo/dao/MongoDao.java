@@ -52,13 +52,13 @@ public class MongoDao {
 	/**
 	 * 更新对象
 	 */
-	public void updateUser(User user) {
-		Query query = new Query(Criteria.where("id").is(user.getId()));
+	public void updateUserAddress(User user) {
+		Query query = new Query(Criteria.where("name").is(user.getId()));
 
 
-		Query query1 = new Query(Criteria.where("id").lt(user.getId()).and("id").in("1"));
+//		Query query1 = new Query(Criteria.where("id").lt(user.getId()).and("id").in("1"));
 
-		Update update = new Update().set("age", user.getAge()).set("name", user.getName());
+		Update update = new Update().set("address", user.getAddress());
 		//更新查询返回结果集的第一条
 		UpdateResult updateResult = mongoTemplate.updateFirst(query, update, User.class);
 		//更新查询返回结果集的所有
@@ -70,7 +70,7 @@ public class MongoDao {
 	 * 删除对象
 	 */
 	public void deleteUser(User user) {
-		Query query = new Query(Criteria.where("id").is(user.getId()));
+		Query query = new Query(Criteria.where("name").is(user.getName()));
 		DeleteResult remove = mongoTemplate.remove(query, User.class);
 //		mongoTemplate.remove(user);
 	}
