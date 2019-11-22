@@ -118,6 +118,26 @@ public class MongoDbController {
 		return "分组查询成功---->" + users.toString();
 	}
 
+	/**
+	 * 原子性操作 查询更新
+	 * @return
+	 */
+	@RequestMapping("atomicityFindAndUpdate")
+	public String atomicityFindAndUpdate() {
+		User users = mongoDao.atomicityFindAndUpdate();
+		return "原子性操作查询更新成功---->" + users.toString();
+	}
+
+
+	/**
+	 * 原子性操作 查询删除
+	 * @return
+	 */
+	@RequestMapping("atomicityFindAndRemove")
+	public String atomicityFindAndRemove() {
+		User users = mongoDao.atomicityFindAndRemove();
+		return "原子性操作查询删除成功---->" + users.toString();
+	}
 
 
 }
