@@ -4,4 +4,6 @@ spring:
       authentication-database: admin
       username: admin
       password: password
-      uri: mongodb://localhost:27017
+      port: 27017
+      database: 111
+      host: localhost
